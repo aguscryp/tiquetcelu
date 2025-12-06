@@ -29,6 +29,7 @@
       const fecha = new Date().toLocaleDateString("es-AR");
       const ref = "#"+Date.now();
 
+      // ===== Página 1 =====
       // Logo
       doc.setFillColor(26,115,232);
       doc.circle(105, 25, 15, "F");
@@ -67,18 +68,19 @@
       doc.setTextColor(0,0,0);
 
       const texto = `
+1. Procedimiento
 Estimado/a ${nombre}, acusamos recibo de su solicitud de evaluación crediticia asociada al DNI ${dni}.
 
+2. Evaluación
 Para avanzar en el proceso, usted aceptó las políticas informadas por nuestro equipo a través del canal de atención asignado. El análisis se realiza con herramientas automatizadas y controles internos, garantizando objetividad y trazabilidad.
 
+3. Resultado
 Nuestro equipo de asesoría y administración verificó la información y ejecutó las pruebas correspondientes sobre sus datos. El importe abonado fue correctamente imputado al sistema y registrado en su expediente.
-
 El resultado actual indica que usted no es apto para operar con nosotros en este momento. Este dictamen surge de los criterios del sistema y no de decisiones discrecionales del equipo. El análisis corre 24/7 y se actualiza de forma periódica.
 
+4. Próximos pasos
 Su perfil permanece en observación. En un plazo estimado de 1 a 2 meses, el sistema podrá reevaluar su caso y notificarle automáticamente si cumple con los requerimientos vigentes.
-
 Recibimos un volumen elevado de consultas diarias. Si bien no todas resultan aprobadas, los casos aceptados obtienen su crédito en tiempo y forma, conforme a los procesos internos y evidencia publicada en canales oficiales.
-
 Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes previos, puede hacerlo en el chat asignado. Nuestro objetivo es que el procedimiento sea claro y respetuoso, y que usted cuente con información precisa en cada etapa.
 `;
 
@@ -113,7 +115,62 @@ Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes pre
       doc.setFont("times", "normal");
       doc.text("Equipo de asesores – Arprest", 20, y + 16);
 
-      // Sello digital
+      // ===== Página 2 =====
+      doc.addPage();
+
+      // Encabezado
+      doc.setTextColor(26,115,232);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.text("Resumen y métricas", 105, 20, { align: "center" });
+      doc.setDrawColor(26,115,232);
+      doc.setLineWidth(0.6);
+      doc.line(20, 22, 190, 22);
+
+      // Resumen del caso
+      doc.setFontSize(11);
+      doc.setTextColor(30);
+      doc.setFont("helvetica", "bold");
+      doc.text("Resumen del caso", 20, 34);
+
+      doc.setDrawColor(200);
+      doc.roundedRect(20, 38, 170, 28, 3, 3);
+      doc.setFont("helvetica", "normal");
+      doc.text("Cliente:", 26, 48);
+      doc.text(nombre, 55, 48);
+      doc.text("DNI:", 26, 56);
+      doc.text(dni, 55, 56);
+      doc.text("Estado:", 100, 48);
+      doc.setTextColor(200, 60, 60);
+      doc.text("No apto (temporal)", 123, 48);
+      doc.setTextColor(30);
+      doc.text("Reevaluación estimada:", 100, 56);
+      doc.text("1–2 meses", 153, 56);
+
+      // Gráfico simple
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(26,115,232);
+      doc.text("Estadísticas de solicitudes (ejemplo)", 105, 78, { align: "center" });
+
+      doc.setDrawColor(120);
+      doc.line(40, 85, 40, 125); // eje Y
+      doc.line(40, 125, 140, 125); // eje X
+
+      doc.setFillColor(200,210,255);
+      doc.rect(55, 125, 22, -36, "F");
+      doc.setTextColor(30);
+      doc.setFontSize(10);
+      doc.text("557 consultas", 66, 129, { align: "center" });
+
+      doc.setFillColor(26,115,232);
+      doc.rect(100, 125, 22, -18, "F");
+      doc.text("20% aceptadas", 111, 129, { align: "center" });
+
+      doc.setTextColor(100);
+      doc.setFontSize(9);
+      doc.text("Las métricas son ilustrativas y pueden variar según el período analizado.", 40, 135);
+
+            // Sello digital
       doc.setDrawColor(160);
       doc.setFillColor(245,245,245);
       doc.circle(170, 250, 20, "F");
@@ -124,7 +181,7 @@ Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes pre
       doc.setFont("helvetica", "normal");
       doc.text("Arprest", 170, 253, { align: "center" });
 
-      // Salida
+      // ============ Salida ============
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
@@ -150,3 +207,4 @@ Gracias por confiar en Arprest 🙌💙`;
   </script>
 </body>
 </html>
+
