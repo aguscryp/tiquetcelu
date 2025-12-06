@@ -69,18 +69,178 @@
       const dni = document.getElementById("dni").value.trim();
       if (!nombre || !dni) return alert("Completa ambos campos.");
 
-      // ... aquí va todo el contenido del PDF (logo, texto, marcas de agua, gráfico, etc.) ...
+      const fecha = new Date().toLocaleDateString("es-AR");
+      const ref = "#"+Date.now();
 
+      // ===== Página 1 =====
+      doc.setFillColor(26,115,232);
+      doc.circle(105, 25, 15, "F");
+      doc.setTextColor(255,255,255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("Arprest", 105, 29, { align: "center" });
+
+      doc.setTextColor(26,115,232);
+      doc.setFontSize(13);
+      doc.text("Notificación oficial", 105, 45, { align: "center" });
+      doc.setDrawColor(26,115,232);
+      doc.setLineWidth(0.8);
+      doc.line(20, 48, 190, 48);
+
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Fecha: ${fecha}`, 20, 54);
+      doc.text(`Ref: ${ref}`, 190, 54, { align: "right" });
+
+      doc.setFillColor(245,247,251);
+      doc.roundedRect(20, 60, 170, 18, 3, 3, "F");
+      doc.setTextColor(30);
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Cliente: ${nombre}`, 26, 68);
+      doc.setFont("helvetica", "normal");
+      doc.text(`DNI: ${dni}`, 126, 68);
+
+      // Marcas de agua
+      doc.setFontSize(40);
+      doc.setTextColor(220);
+      doc.setFont("helvetica", "bold");
+      doc.text("ARPREST", 60, 120, { angle: 45 });
+      doc.text("ARPREST", 120, 200, { angle: 45 });
+      doc.text("ARPREST", 30, 250, { angle: 45 });
+
+      // Texto principal
+      doc.setFont("times", "normal");
+      doc.setFontSize(12);
+      doc.setTextColor(0,0,0);
+
+      const texto = `
+1. Procedimiento
+Estimado/a ${nombre}, acusamos recibo de su solicitud de evaluación crediticia asociada al DNI ${dni}.
+
+2. Evaluación
+Para avanzar en el proceso, usted aceptó las políticas informadas por nuestro equipo a través del canal de atención asignado. El análisis se realiza con herramientas automatizadas y controles internos, garantizando objetividad y trazabilidad.
+
+3. Resultado
+Nuestro equipo de asesoría y administración verificó la información y ejecutó las pruebas correspondientes sobre sus datos. El importe abonado fue correctamente imputado al sistema y registrado en su expediente.
+El resultado actual indica que usted no es apto para operar con nosotros en este momento. Este dictamen surge de los criterios del sistema y no de decisiones discrecionales del equipo. El análisis corre 24/7 y se actualiza de forma periódica.
+
+4. Próximos pasos
+Su perfil permanece en observación. En un plazo estimado de 1 a 2 meses, el sistema podrá reevaluar su caso y notificarle automáticamente si cumple con los requerimientos vigentes.
+Recibimos un volumen elevado de consultas diarias. Si bien no todas resultan aprobadas, los casos aceptados obtienen su crédito en tiempo y forma, conforme a los procesos internos y evidencia publicada en canales oficiales.
+Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes previos, puede hacerlo en el chat asignado. Nuestro objetivo es que el procedimiento sea claro y respetuoso, y que usted cuente con información precisa en cada etapa.
+`;
+
+      const parrafos = doc.splitTextToSize(texto, 160);
+      let y = 85;
+      parrafos.forEach(line => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.text(line, 25, y);
+        y += 6;
+      });
+
+      if (y > 250) { doc.addPage(); y = 20; }
+      doc.setFillColor(230,240,255);
+      doc.roundedRect(20, y, 170, 16, 3, 3, "F");
+      doc.setTextColor(26,115,232);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("Resultado actual: No apto. Reevaluación automática estimada: 1–2 meses.", 25, y + 10);
+
+      y += 30;
+      doc.setTextColor(0,0,0);
+      doc.setFont("times", "italic");
+      doc.setFontSize(12);
+      doc.text("Atentamente,", 20, y);
+      doc.setFont("helvetica", "bold");
+      doc.text("Ramiro Aciar", 20, y + 8);
+      doc.setFont("times", "normal");
+      doc.text("Equipo de asesores – Arprest", 20, y + 16);
+
+      // ===== Página 2 =====
+      doc.addPage();
+
+      doc.setFontSize(40);
+      doc.setTextColor(220);
+      doc.setFont("helvetica", "bold");
+      doc.text("ARPREST", 60, 120, { angle: 45 });
+      doc.text("ARPREST", 120, 200, { angle: 45 });
+      doc.text("ARPREST", 30, 250, { angle: 45 });
+
+      doc.setTextColor(26,115,232);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.text("Resumen y métricas", 105, 20, { align: "center" });
+      doc.setDrawColor(26,115,232);
+      doc.setLineWidth(0.6);
+      doc.line(20, 22, 190, 22);
+
+      doc.setFontSize(11);
+      doc.setTextColor(30);
+      doc.setFont("helvetica", "bold");
+      doc.text("Resumen del caso", 20, 34);
+
+            doc.setDrawColor(200);
+      doc.roundedRect(20, 38, 170, 28, 3, 3);
+      doc.setFont("helvetica", "normal");
+      doc.text("Cliente:", 26, 48);
+      doc.text(nombre, 55, 48);
+      doc.text("DNI:", 26, 56);
+      doc.text(dni, 55, 56);
+      doc.text("Estado:", 100, 48);
+      doc.setTextColor(200, 60, 60);
+      doc.text("No apto (temporal)", 123, 48);
+      doc.setTextColor(30);
+      doc.text("Reevaluación estimada:", 100, 56);
+      doc.text("1–2 meses", 153, 56);
+
+      // Gráfico actualizado
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(26,115,232);
+      doc.text("Estadísticas de solicitudes", 105, 78, { align: "center" });
+
+      doc.setDrawColor(120);
+      doc.line(40, 85, 40, 125); // eje Y
+      doc.line(40, 125, 170, 125); // eje X
+
+      // Barra 1: 557 consultas
+      doc.setFillColor(200,210,255);
+      doc.rect(55, 125, 30, -36, "F");
+      doc.setTextColor(30);
+      doc.setFontSize(10);
+      doc.text("557 consultas", 70, 129, { align: "center" });
+
+      // Barra 2: 78% aprobados
+      doc.setFillColor(26,115,232);
+      doc.rect(110, 125, 30, -28, "F");
+      doc.setTextColor(30);
+      doc.text("78% aprobados", 125, 129, { align: "center" });
+
+      doc.setTextColor(100);
+      doc.setFontSize(9);
+      doc.text("Las métricas son ilustrativas y pueden variar según el período analizado.", 40, 140);
+
+      // Sello digital
+      doc.setDrawColor(160);
+      doc.setFillColor(245,245,245);
+      doc.circle(170, 250, 20, "F");
+      doc.setFontSize(8);
+      doc.setTextColor(100);
+      doc.setFont("helvetica", "bold");
+      doc.text("Documento Oficial", 170, 247, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.text("Arprest", 170, 253, { align: "center" });
+
+      // ============ Salida ============
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
-      // Mostrar enlaces
       document.getElementById("link").innerHTML = `
         <a href="${pdfUrl}" target="_blank">📄 Abrir PDF generado</a>
         <a href="#" onclick="descargarPDF('${pdfUrl}')">⬇️ Descargar PDF</a>
       `;
+      document.getElementById("link").style.display = "block";
 
-      // Mensaje corporativo
       const mensaje = `✨ Hola Sr./Sra. ${nombre} ✨
 Soy Ramiro Aciar del equipo de asesores 💼 respecto al crédito que solicitó.
 Aquí tiene el acceso directo al resultado actual de su solicitud con el DNI ${dni} 📊
@@ -115,4 +275,3 @@ El contrato vigente con términos clave, políticas de evaluación y condiciones
   </script>
 </body>
 </html>
-
