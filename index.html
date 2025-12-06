@@ -2,118 +2,281 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Tiquets Pendientes</title>
+  <title>Tiquets Pendientes – Arprest</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 20%, #6aa8ff 0%, #1a73e8 25%, #0f4fd6 60%, #0b2e7a 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+    .card {
+      background: #fff;
+      width: 92%;
+      max-width: 520px;
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(12, 60, 160, 0.35);
+      padding: 34px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-size: 28px;
+      color: #0c2e6e;
+      letter-spacing: 0.2px;
+    }
+    .sub { color: #3c4b7a; margin-bottom: 18px; font-size: 14px; }
+    .row { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 8px; }
+    input {
+      width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #d7deea;
+      font-size: 15px; transition: box-shadow 250ms ease, border-color 250ms ease, transform 200ms ease;
+      background: #f8fbff;
+    }
+    input:focus {
+      outline: none; border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26,115,232,0.15);
+      transform: translateY(-1px); background: #fff;
+    }
+    .btn {
+      margin-top: 14px; display: inline-flex; align-items: center; gap: 10px; padding: 14px 18px;
+      border: none; border-radius: 14px; background: linear-gradient(90deg, #1a73e8, #7b3fe4);
+      color: #fff; font-weight: 600; letter-spacing: 0.2px; cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, filter 200ms ease;
+    }
+    .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 26px rgba(26,115,232,0.35); filter: saturate(1.05); }
+    .link { margin-top: 16px; display: none; font-size: 14px; }
+    .copied { margin-top: 10px; color: #128a44; font-weight: 600; display: none; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Tiquets Pendientes</h1>
-    <input type="text" id="nombre" placeholder="Nombre del cliente" required>
-    <input type="text" id="dni" placeholder="DNI del cliente" required>
-    <button onclick="generarPDF()">Generar Enlace</button>
-    <div id="link"></div>
+  <div class="card">
+    <h1>Tiquets pendientes</h1>
+    <p class="sub">Generá el PDF corporativo y compartí el enlace con tu cliente.</p>
+    <div class="row">
+      <input type="text" id="nombre" placeholder="Nombre del cliente" required>
+      <input type="text" id="dni" placeholder="DNI del cliente" required>
+    </div>
+    <button class="btn" onclick="generarPDF()">Generar enlace</button>
+    <div id="link" class="link"></div>
+    <div id="copied" class="copied">✅ Mensaje copiado al portapapeles</div>
   </div>
 
   <script>
     async function generarPDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
       const nombre = document.getElementById("nombre").value.trim();
       const dni = document.getElementById("dni").value.trim();
+      if (!nombre || !dni) { alert("Por favor complete todos los campos."); return; }
 
-      if (!nombre || !dni) {
-        alert("Por favor complete todos los campos.");
-        return;
-      }
+      // Datos de documento
+      const fecha = new Date().toLocaleDateString("es-AR");
+      const referencia = "Ref: #" + String(new Date().getTime());
 
+      // ===== Página 1: Encabezado, personalización y cuerpo =====
       // Logo circular azul con texto centrado
       doc.setFillColor(26,115,232);
-      doc.circle(105, 25, 20, "F"); 
+      doc.circle(105, 20, 15, "F");
       doc.setTextColor(255,255,255);
-      doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.text("Arprest", 105, 30, { align: "center" });
-
-      // Encabezado
-      doc.setDrawColor(26,115,232);
-      doc.setLineWidth(1);
-      doc.line(20, 50, 190, 50);
-      doc.setTextColor(26,115,232);
       doc.setFontSize(14);
-      doc.text("Notificación Oficial", 105, 45, { align: "center" });
+      doc.text("Arprest", 105, 24, { align: "center" });
 
-      // Bloque de personalización avanzada
-      doc.setFillColor(240,240,240);
-      doc.roundedRect(20, 60, 170, 20, 3, 3, "F");
-      doc.setTextColor(0,0,0);
+      // Título y línea
+      doc.setTextColor(26,115,232);
+      doc.setFontSize(13);
+      doc.text("Notificación oficial", 105, 36, { align: "center" });
+      doc.setDrawColor(26,115,232);
+      doc.setLineWidth(0.8);
+      doc.line(20, 39, 190, 39);
+
+      // Fecha y referencia
+      doc.setTextColor(100);
+      doc.setFontSize(10);
+      doc.text(`Fecha: ${fecha}`, 20, 44);
+      doc.text(referencia, 190, 44, { align: "right" });
+
+      // Tarjeta de personalización avanzada
+      doc.setFillColor(245,247,251);
+      doc.roundedRect(20, 50, 170, 18, 3, 3, "F");
+      doc.setTextColor(30);
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
-      doc.text(`Cliente: ${nombre}   |   DNI: ${dni}`, 25, 73);
+      doc.text(`Cliente: ${nombre}`, 26, 58);
+      doc.setFont("helvetica", "normal");
+      doc.text(`DNI: ${dni}`, 126, 58);
 
-      // Texto principal
+      // Marca de agua diagonal
+      doc.setFontSize(38);
+      doc.setTextColor(210);
+      doc.text("ARPREST", 45, 145, { angle: 45 });
+
+      // Cuerpo del documento (redacción corregida)
+      doc.setTextColor(0,0,0);
       doc.setFont("times", "normal");
       doc.setFontSize(12);
-      let texto = `
-Estimado Sr. cliente ${nombre}, brindamos respuesta aquí mismo ante la solicitud asignada por presunto crédito derivado desde su DNI ${dni}.
 
-Al seguir correctamente el procedimiento para trabajar con nosotros, usted aceptó cada una de las políticas que nuestro equipo le brindó mediante atención al cliente en el WhatsApp asignado.
+      const parrafos = [
+        `Estimado/a ${nombre}, acusamos recibo de su solicitud de evaluación crediticia asociada al DNI ${dni}.`,
+        `Para avanzar en el proceso, usted aceptó las políticas informadas por nuestro equipo a través del canal de atención asignado. El análisis se realiza con herramientas automatizadas y controles internos, garantizando objetividad y trazabilidad.`,
+        `Nuestro equipo de asesoría y administración verificó la información y ejecutó las pruebas correspondientes sobre sus datos. El importe abonado fue correctamente imputado al sistema y registrado en su expediente.`,
+        `El resultado actual indica que usted no es apto para operar con nosotros en este momento. Este dictamen surge de los criterios del sistema y no de decisiones discrecionales del equipo. El análisis corre 24/7 y se actualiza de forma periódica.`,
+        `Su perfil permanece en observación. En un plazo estimado de 1 a 2 meses, el sistema podrá reevaluar su caso y notificarle automáticamente si cumple con los requerimientos vigentes.`,
+        `Recibimos un volumen elevado de consultas diarias. Si bien no todas resultan aprobadas, los casos aceptados obtienen su crédito en tiempo y forma, conforme a los procesos internos y evidencia publicada en canales oficiales.`,
+        `Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes previos, puede hacerlo en el chat asignado. Nuestro objetivo es que el procedimiento sea claro y respetuoso, y que usted cuente con información precisa en cada etapa.`
+      ];
 
-Nuestro equipo está totalmente capacitado para este tipo de atención y asesoría, buscando posibles nuevos clientes con los cuales podamos trabajar cómodamente.
+      let y = 75;
+      parrafos.forEach(p => {
+        const lines = doc.splitTextToSize(p, 170);
+        doc.text(lines, 20, y, { align: "justify" });
+        y += lines.length * 6 + 2;
+      });
 
-El dinero adjuntado por dicho informe de sus datos fue abonado al sistema como se indicó al inicio, y se realizó una evaluación de su diagnóstico mediante todo el equipo de asesoría y administración.
+      // Bloque destacado de resultado
+      doc.setFillColor(230,240,255);
+      doc.roundedRect(20, y, 170, 16, 3, 3, "F");
+      doc.setTextColor(26,115,232);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("Resultado actual: No apto. Reevaluación automática estimada: 1–2 meses.", 25, y + 10);
 
-Esta es una notificación oficial de que usted no es apto actualmente para trabajar con nosotros; quizás en un futuro sí lo sea. Queremos reiterar que este resultado no fue inventado por nuestro equipo, sino que proviene de sistemas funcionando 24 horas analizando a cada cliente.
-`;
-      doc.text(texto, 20, 90, { maxWidth: 170, align: "justify" });
+      // Firma
+      const firmaBaseY = y + 28;
+      doc.setTextColor(0,0,0);
+      doc.setFont("times", "italic");
+      doc.setFontSize(12);
+      doc.text("Atentamente,", 20, firmaBaseY);
+      doc.setFont("helvetica", "bold");
+      doc.text("Ramiro Aciar", 20, firmaBaseY + 8);
+      doc.setFont("times", "normal");
+      doc.text("Equipo de asesores – Arprest", 20, firmaBaseY + 16);
+
+      // Pie institucional (simulación de degradado con dos franjas)
+      doc.setFillColor(26,115,232);
+      doc.rect(0, 282, 210, 8, "F");
+      doc.setFillColor(123,63,228);
+      doc.rect(0, 290, 210, 8, "F");
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(10);
+      doc.text("📞 +54 264 555-1234   ✉️ contacto@arprest.com   🌐 www.arprest.com", 105, 286.5, { align: "center" });
+      doc.text("Siempre cerca de nuestros clientes", 105, 294.5, { align: "center" });
+
+      // ===== Página 2: Resumen, gráfico y sello =====
+      doc.addPage();
+
+      // Encabezado página 2
+      doc.setTextColor(26,115,232);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.text("Resumen y métricas", 105, 20, { align: "center" });
+      doc.setDrawColor(26,115,232);
+      doc.setLineWidth(0.6);
+      doc.line(20, 22, 190, 22);
+
+      // Tabla de resumen (datos clave)
+      doc.setFontSize(11);
+      doc.setTextColor(30);
+      doc.setFont("helvetica", "bold");
+      doc.text("Resumen del caso", 20, 34);
+
+      // Marco de tabla
+      doc.setDrawColor(200);
+      doc.roundedRect(20, 38, 170, 28, 3, 3);
+      doc.setFont("helvetica", "normal");
+      doc.text("Cliente:", 26, 48);
+      doc.text(nombre, 55, 48);
+      doc.text("DNI:", 26, 56);
+      doc.text(dni, 55, 56);
+      doc.text("Estado:", 100, 48);
+      doc.setTextColor(200, 60, 60);
+      doc.text("No apto (temporal)", 123, 48);
+      doc.setTextColor(30);
+      doc.text("Reevaluación estimada:", 100, 56);
+      doc.text("1–2 meses", 153, 56);
 
       // Gráfico simple: consultas vs aceptadas
       doc.setFont("helvetica", "bold");
       doc.setTextColor(26,115,232);
-      doc.text("Estadísticas de solicitudes", 105, 150, { align: "center" });
+      doc.text("Estadísticas de solicitudes (ejemplo)", 105, 78, { align: "center" });
 
       // Ejes
-      doc.setDrawColor(0);
-      doc.line(40, 160, 40, 200); // eje Y
-      doc.line(40, 200, 120, 200); // eje X
+      doc.setDrawColor(120);
+      doc.line(40, 85, 40, 125); // eje Y
+      doc.line(40, 125, 140, 125); // eje X
 
-      // Barra total consultas
-      doc.setFillColor(200,200,255);
-      doc.rect(50, 180, 20, -40, "F");
-      doc.setTextColor(0);
+      // Barras
+      // Total consultas (557) – altura 36
+      doc.setFillColor(200,210,255);
+      doc.rect(55, 125, 22, -36, "F");
+      doc.setTextColor(30);
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      doc.text("557 consultas", 50, 175);
+      doc.text("557 consultas", 66, 129, { angle: 0, align: "center" });
 
-      // Barra aceptadas
+      // Aceptadas (~20%) – altura 18
       doc.setFillColor(26,115,232);
-      doc.rect(90, 190, 20, -20, "F");
-      doc.text("20% aceptadas", 90, 185);
+      doc.rect(100, 125, 22, -18, "F");
+      doc.setTextColor(30);
+      doc.text("20% aceptadas", 111, 129, { align: "center" });
 
-      // Sello digital
-      doc.setDrawColor(150);
-      doc.setFillColor(240,240,240);
+      // Nota metodológica
+      doc.setTextColor(100);
+      doc.setFontSize(9);
+      doc.text("Las métricas son ilustrativas y pueden variar según el período analizado.", 40, 135);
+
+      // Sello digital oficial
+      doc.setDrawColor(160);
+      doc.setFillColor(245,245,245);
       doc.circle(170, 250, 20, "F");
       doc.setFontSize(8);
       doc.setTextColor(100);
-      doc.text("Documento Oficial", 170, 248, { align: "center" });
-      doc.text("Arprest", 170, 254, { align: "center" });
-
-      // Firma
-      doc.setTextColor(0,0,0);
-      doc.setFont("times", "italic");
-      doc.text("Un abrazo cordial,", 20, 240);
       doc.setFont("helvetica", "bold");
-      doc.text("Ramiro Aciar", 20, 248);
-      doc.setFont("times", "normal");
-      doc.text("Equipo de asesores", 20, 256);
+      doc.text("Documento Oficial", 170, 247, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.text("Arprest", 170, 253, { align: "center" });
 
+      // Pie página 2
+      doc.setFillColor(26,115,232);
+      doc.rect(0, 282, 210, 8, "F");
+      doc.setFillColor(123,63,228);
+      doc.rect(0, 290, 210, 8, "F");
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(10);
+      doc.text("📞 +54 264 555-1234   ✉️ contacto@arprest.com   🌐 www.arprest.com", 105, 286.5, { align: "center" });
+      doc.text("El futuro está más cerca de lo que imagina 🚀", 105, 294.5, { align: "center" });
+
+      // Salida: solo enlace (no descarga) y copia al portapapeles
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
       const linkDiv = document.getElementById("link");
       linkDiv.innerHTML = `<a href="${pdfUrl}" target="_blank">📄 Abrir PDF generado</a>`;
       linkDiv.style.display = "block";
+
+      // Mensaje marketing con emojis + enlace
+      const mensaje = `✨ Hola Sr./Sra. ${nombre} ✨
+Soy Ramiro Aciar del equipo de asesores 💼 respecto al crédito que solicitó.
+Aquí tiene el acceso directo al resultado actual de su solicitud 📊:
+
+${pdfUrl}
+
+🚀 Seguimos acompañándolo en cada paso para brindarle la mejor experiencia.
+Gracias por confiar en Arprest 🙌💙`;
+      try {
+        await navigator.clipboard.writeText(mensaje);
+        document.getElementById("copied").style.display = "block";
+      } catch (e) {
+        console.warn("No se pudo copiar al portapapeles automáticamente.");
+      }
     }
   </script>
 </body>
 </html>
+
 
