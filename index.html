@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tiquets Pendientes</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a73e8, #4a90e2);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+    h1 {
+      color: #1a73e8;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      font-size: 15px;
+    }
+    input:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 10px rgba(26,115,232,0.4);
+      outline: none;
+    }
+    button {
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      padding: 16px 22px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+    button:hover {
+      background: #0c5bdc;
+      transform: scale(1.07);
+    }
+    #link {
+      margin-top: 20px;
+      display: none;
+      font-size: 14px;
+    }
+    #copied {
+      margin-top: 10px;
+      color: green;
+      font-weight: bold;
+      display: none;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tiquets Pendientes</h1>
+    <input type="text" id="nombre" placeholder="Nombre del cliente" required>
+    <input type="text" id="dni" placeholder="DNI del cliente" required>
+    <button onclick="generarPDF()">Generar Enlace</button>
+    <div id="link"></div>
+    <div id="copied">✅ Mensaje copiado al portapapeles</div>
+  </div>
+
+  <script>
+    async function generarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const dni = document.getElementById("dni").value.trim();
+
+      if (!nombre || !dni) {
+        alert("Por favor complete todos los campos.");
+        return;
+      }
+
+      // Logo circular azul
+      doc.setFillColor(26,115,232);
+      doc.circle(105, 20, 15, "F");
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(16);
+      doc.text("Arprest", 97, 25);
+
+      doc.setTextColor(0,0,0);
+      doc.setFontSize(12);
+
+      let texto = `
+Estimado Sr. cliente ${nombre}, brindamos respuesta aquí mismo ante la solicitud asignada por presunto crédito derivado desde su DNI ${dni}.
+
+Ante los pasos correctos del procedimiento al intentar trabajar con nosotros, usted ha aceptado cada una de las políticas que el equipo le ha brindado mediante atención al cliente en medio del WhatsApp asignado.
+
+Nuestro equipo de trabajo está totalmente capacitado para este tipo de atención y asesoría, buscando posibles nuevos clientes con los cuales poder trabajar cómodamente.
+
+El dinero adjuntado por dicho informe de sus datos fue totalmente abonado al sistema como se indicó al principio, y se realizó una breve prueba de su diagnóstico mediante todo el equipo de asesoría y administración.
+
+Esto es una notificación oficial de que usted no es apto actualmente para trabajar con nosotros, pero quizás en un futuro sí sea posible. Queremos reiterar que este resultado actual no fue inventado por nuestro equipo, sino que proviene de sistemas funcionando 24hs analizando a cada cliente.
+
+Actualmente en nuestra base tenemos un informe de sus datos y nuestro sistema, en el plazo de 1 o 2 meses, puede notificarle cuando logre convertirse en cliente nuestro si cumple con los requerimientos del procedimiento exacto.
+
+Un abrazo cordial,
+Ramiro Aciar
+Equipo de asesores
+`;
+
+      doc.setFont("times", "normal");
+      doc.setFontSize(12);
+      doc.text(texto, 20, 50, { maxWidth: 170, align: "justify" });
+
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+
+      const linkDiv = document.getElementById("link");
+      linkDiv.innerHTML = `<a href="${pdfUrl}" target="_blank">📄 Abrir PDF generado</a>`;
+      linkDiv.style.display = "block";
+
+      // Mensaje marketing con emojis
+      const mensaje = `✨ Hola Sr. cliente ${nombre} ✨
+Soy Ramiro Aciar del equipo de asesores 💼 respecto al crédito que solicitó.
+Aquí abajo le dejo el enlace directo al resultado actual de su solicitud 📊:
+
+${pdfUrl}
+
+🚀 Nuestro compromiso es acompañarlo en cada paso y brindarle la mejor experiencia posible. 
+Gracias por confiar en nosotros 🙌💙`;
+
+      // Copiar al portapapeles
+      navigator.clipboard.writeText(mensaje).then(() => {
+        document.getElementById("copied").style.display = "block";
+      });
+    }
+  </script>
+</body>
+</html>
 
