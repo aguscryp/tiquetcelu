@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Tiquets Pendientes – Arprest</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <style>
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -25,19 +25,34 @@
     h1 { margin: 0 0 18px; font-size: 28px; color: #0c2e6e; }
     .sub { color: #3c4b7a; margin-bottom: 18px; font-size: 14px; }
     input {
-      width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #d7deea;
-      font-size: 15px; background: #f8fbff; margin-bottom: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #d7deea;
+      font-size: 15px;
+      background: #f8fbff;
+      margin-bottom: 12px;
     }
     input:focus {
-      outline: none; border-color: #1a73e8; box-shadow: 0 0 0 4px rgba(26,115,232,0.15);
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 4px rgba(26,115,232,0.15);
       background: #fff;
     }
     .btn {
-      margin-top: 14px; padding: 14px 18px; border: none; border-radius: 14px;
-      background: linear-gradient(90deg, #1a73e8, #7b3fe4); color: #fff;
-      font-weight: 600; cursor: pointer;
+      margin-top: 14px;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(90deg, #1a73e8, #7b3fe4);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
     }
-    .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 26px rgba(26,115,232,0.35); }
+    .btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 26px rgba(26,115,232,0.35);
+    }
     .link { margin-top: 16px; display: none; font-size: 14px; }
     .copied { margin-top: 10px; color: #128a44; font-weight: 600; display: none; }
   </style>
@@ -46,46 +61,64 @@
   <div class="card">
     <h1>Tiquets pendientes</h1>
     <p class="sub">Generá el PDF corporativo y compartí el enlace con tu cliente.</p>
-    <input type="text" id="nombre" placeholder="Nombre del cliente" required>
-    <input type="text" id="dni" placeholder="DNI del cliente" required>
-    <button class="btn" onclick="generarPDF()">Generar enlace</button>
+    <input type="text" id="nombre" placeholder="Nombre del cliente" required />
+    <input type="text" id="dni" placeholder="DNI del cliente" required />
+    <button class="btn" id="btnGenerar">Generar enlace</button>
     <div id="link" class="link"></div>
     <div id="copied" class="copied">✅ Mensaje copiado al portapapeles</div>
   </div>
 
   <script>
+    // Esperar a que jsPDF esté disponible (por el atributo defer del script CDN)
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("btnGenerar");
+      btn.addEventListener("click", generarPDF);
+    });
+
     async function generarPDF() {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert("No se pudo cargar jsPDF. Verifique su conexión.");
+        return;
+      }
+
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
 
       const nombre = document.getElementById("nombre").value.trim();
       const dni = document.getElementById("dni").value.trim();
-      if (!nombre || !dni) { alert("Por favor complete todos los campos."); return; }
+      if (!nombre || !dni) {
+        alert("Por favor complete todos los campos.");
+        return;
+      }
 
       const fecha = new Date().toLocaleDateString("es-AR");
       const referencia = "Ref: #" + String(new Date().getTime());
 
-      // ===== Página 1 =====
-      doc.setFillColor(26,115,232);
+      // ============ Página 1 ============
+      // Logo circular
+      doc.setFillColor(26, 115, 232);
       doc.circle(105, 25, 15, "F");
-      doc.setTextColor(255,255,255);
+      doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
       doc.text("Arprest", 105, 29, { align: "center" });
 
-      doc.setTextColor(26,115,232);
+      // Título y línea
+      doc.setTextColor(26, 115, 232);
       doc.setFontSize(13);
       doc.text("Notificación oficial", 105, 45, { align: "center" });
-      doc.setDrawColor(26,115,232);
+      doc.setDrawColor(26, 115, 232);
       doc.setLineWidth(0.8);
       doc.line(20, 48, 190, 48);
 
+      // Fecha y referencia
       doc.setTextColor(100);
       doc.setFontSize(10);
       doc.text(`Fecha: ${fecha}`, 20, 54);
       doc.text(referencia, 190, 54, { align: "right" });
 
-      doc.setFillColor(245,247,251);
+      // Tarjeta de cliente
+      doc.setFillColor(245, 247, 251);
       doc.roundedRect(20, 60, 170, 18, 3, 3, "F");
       doc.setTextColor(30);
       doc.setFont("helvetica", "bold");
@@ -94,11 +127,13 @@
       doc.setFont("helvetica", "normal");
       doc.text(`DNI: ${dni}`, 126, 68);
 
+      // Marca de agua
       doc.setFontSize(38);
       doc.setTextColor(210);
       doc.text("ARPREST", 45, 145, { angle: 45 });
 
-      doc.setTextColor(0,0,0);
+      // Párrafos (márgenes amplios: x=25, maxWidth=160)
+      doc.setTextColor(0, 0, 0);
       doc.setFont("times", "normal");
       doc.setFontSize(12);
 
@@ -113,21 +148,25 @@
       ];
 
       let y = 80;
-      parrafos.forEach(p => {
-        const lines = doc.splitTextToSize(p, 160); // margen más amplio
-        doc.text(lines, 25, y, { align: "justify" });
+      const margenX = 25;
+      const anchoTexto = 160; // asegura margen derecho
+      parrafos.forEach((p) => {
+        const lines = doc.splitTextToSize(p, anchoTexto);
+        doc.text(lines, margenX, y, { align: "justify" });
         y += lines.length * 6 + 4;
       });
 
-      doc.setFillColor(230,240,255);
+      // Bloque destacado
+      doc.setFillColor(230, 240, 255);
       doc.roundedRect(20, y, 170, 16, 3, 3, "F");
-      doc.setTextColor(26,115,232);
+      doc.setTextColor(26, 115, 232);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
       doc.text("Resultado actual: No apto. Reevaluación automática estimada: 1–2 meses.", 25, y + 10);
 
+      // Firma
       const firmaBaseY = y + 28;
-      doc.setTextColor(0,0,0);
+      doc.setTextColor(0, 0, 0);
       doc.setFont("times", "italic");
       doc.setFontSize(12);
       doc.text("Atentamente,", 20, firmaBaseY);
@@ -136,20 +175,20 @@
       doc.setFont("times", "normal");
       doc.text("Equipo de asesores – Arprest", 20, firmaBaseY + 16);
 
-      // ===== Página 2 =====
+      // ============ Página 2 ============
       doc.addPage();
 
-      doc.setTextColor(26,115,232);
+      // Encabezado
+      doc.setTextColor(26, 115, 232);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13);
       doc.text("Resumen y métricas", 105, 20, { align: "center" });
-      doc.setDrawColor(26,115,232);
+      doc.setDrawColor(26, 115, 232);
       doc.setLineWidth(0.6);
       doc.line(20, 22, 190, 22);
 
+      // Resumen del caso
       doc.setFontSize(11);
-      doc.setTextColor(30
-             doc.setFontSize(11);
       doc.setTextColor(30);
       doc.setFont("helvetica", "bold");
       doc.text("Resumen del caso", 20, 34);
@@ -170,20 +209,20 @@
 
       // Gráfico simple
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(26,115,232);
+      doc.setTextColor(26, 115, 232);
       doc.text("Estadísticas de solicitudes (ejemplo)", 105, 78, { align: "center" });
 
       doc.setDrawColor(120);
       doc.line(40, 85, 40, 125); // eje Y
       doc.line(40, 125, 140, 125); // eje X
 
-      doc.setFillColor(200,210,255);
+      doc.setFillColor(200, 210, 255);
       doc.rect(55, 125, 22, -36, "F");
       doc.setTextColor(30);
       doc.setFontSize(10);
       doc.text("557 consultas", 66, 129, { align: "center" });
 
-      doc.setFillColor(26,115,232);
+      doc.setFillColor(26, 115, 232);
       doc.rect(100, 125, 22, -18, "F");
       doc.text("20% aceptadas", 111, 129, { align: "center" });
 
@@ -193,7 +232,7 @@
 
       // Sello digital
       doc.setDrawColor(160);
-      doc.setFillColor(245,245,245);
+      doc.setFillColor(245, 245, 245);
       doc.circle(170, 250, 20, "F");
       doc.setFontSize(8);
       doc.setTextColor(100);
@@ -202,7 +241,7 @@
       doc.setFont("helvetica", "normal");
       doc.text("Arprest", 170, 253, { align: "center" });
 
-      // Salida: enlace + mensaje marketing
+      // ============ Salida ============
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
@@ -223,10 +262,10 @@ Gracias por confiar en Arprest 🙌💙`;
         await navigator.clipboard.writeText(mensaje);
         document.getElementById("copied").style.display = "block";
       } catch (e) {
+        // Si el navegador no permite copiar automáticamente
         console.warn("No se pudo copiar al portapapeles automáticamente.");
       }
     }
   </script>
 </body>
 </html>
-                
