@@ -12,39 +12,56 @@
       background: #f0f4f9;
     }
     .container {
-      max-width: 500px;
+      max-width: 400px;
       margin: auto;
       background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 30px 25px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
     }
-    h1 { font-size: 22px; margin-bottom: 20px; text-align:center; }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 25px;
+      text-align:center;
+      color: #1a73e8;
+      font-weight: 600;
+    }
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
     input {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
+      padding: 14px 12px;
+      border: 2px solid #d0d7e2;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus {
+      border-color: #1a73e8;
+      box-shadow: 0 0 0 3px rgba(26,115,232,0.2);
     }
     button {
       width: 100%;
       padding: 14px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #1a73e8;
       color: #fff;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s;
     }
     button:hover { background: #0f5bd6; }
     #link { margin-top: 20px; text-align:center; }
-    #link a { display:block; margin:8px 0; font-size:16px; }
+    #link a { display:block; margin:10px 0; font-size:16px; color:#1a73e8; text-decoration:none; font-weight:500; }
+    #link a:hover { text-decoration:underline; }
     #copied { margin-top:10px; color:green; font-weight:bold; text-align:center; display:none; }
     @media (max-width:600px) {
-      .container { padding: 15px; }
+      .container { padding: 20px; }
       h1 { font-size: 20px; }
       input, button { font-size: 14px; }
     }
@@ -53,8 +70,12 @@
 <body>
   <div class="container">
     <h1>Generador de PDF Arprest</h1>
-    <input id="nombre" placeholder="Nombre del cliente" />
-    <input id="dni" placeholder="DNI del cliente" />
+    <div class="input-group">
+      <input id="nombre" placeholder="Nombre del cliente" />
+    </div>
+    <div class="input-group">
+      <input id="dni" placeholder="DNI del cliente" />
+    </div>
     <button onclick="generarPDF()">Generar PDF</button>
     <div id="link"></div>
     <div id="copied">✅ Mensaje copiado al portapapeles</div>
@@ -163,8 +184,7 @@ Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes pre
       doc.setFontSize(40);
       doc.setTextColor(220);
       doc.setFont("helvetica", "bold");
-      doc.text("ARPREST", 60, 120, { angle: 45 });
-      doc.text("ARPREST", 120, 200, { angle: 45 });
+            doc.text("ARPREST", 120, 200, { angle: 45 });
       doc.text("ARPREST", 30, 250, { angle: 45 });
 
       doc.setTextColor(26,115,232);
@@ -180,7 +200,7 @@ Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes pre
       doc.setFont("helvetica", "bold");
       doc.text("Resumen del caso", 20, 34);
 
-            doc.setDrawColor(200);
+      doc.setDrawColor(200);
       doc.roundedRect(20, 38, 170, 28, 3, 3);
       doc.setFont("helvetica", "normal");
       doc.text("Cliente:", 26, 48);
