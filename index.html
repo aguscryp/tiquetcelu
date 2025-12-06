@@ -27,10 +27,6 @@
         return;
       }
 
-      // Fecha y referencia
-      const fecha = new Date().toLocaleDateString("es-AR");
-      const referencia = "Ref: #" + new Date().getTime();
-
       // Logo circular azul con texto centrado
       doc.setFillColor(26,115,232);
       doc.circle(105, 25, 20, "F"); 
@@ -39,7 +35,7 @@
       doc.setFont("helvetica", "bold");
       doc.text("Arprest", 105, 30, { align: "center" });
 
-      // Encabezado elegante
+      // Encabezado
       doc.setDrawColor(26,115,232);
       doc.setLineWidth(1);
       doc.line(20, 50, 190, 50);
@@ -47,22 +43,16 @@
       doc.setFontSize(14);
       doc.text("Notificación Oficial", 105, 45, { align: "center" });
 
-      // Fecha y referencia
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Fecha: ${fecha}`, 20, 55);
-      doc.text(referencia, 160, 55);
-
-      // Marca de agua
-      doc.setFontSize(40);
-      doc.setTextColor(200);
-      doc.text("Arprest", 60, 150, { angle: 45 });
+      // Bloque de personalización avanzada
+      doc.setFillColor(240,240,240);
+      doc.roundedRect(20, 60, 170, 20, 3, 3, "F");
+      doc.setTextColor(0,0,0);
+      doc.setFontSize(11);
+      doc.text(`Cliente: ${nombre}   |   DNI: ${dni}`, 25, 73);
 
       // Texto principal
-      doc.setTextColor(0,0,0);
       doc.setFont("times", "normal");
       doc.setFontSize(12);
-
       let texto = `
 Estimado Sr. cliente ${nombre}, brindamos respuesta aquí mismo ante la solicitud asignada por presunto crédito derivado desde su DNI ${dni}.
 
@@ -73,26 +63,41 @@ Nuestro equipo está totalmente capacitado para este tipo de atención y asesor�
 El dinero adjuntado por dicho informe de sus datos fue abonado al sistema como se indicó al inicio, y se realizó una evaluación de su diagnóstico mediante todo el equipo de asesoría y administración.
 
 Esta es una notificación oficial de que usted no es apto actualmente para trabajar con nosotros; quizás en un futuro sí lo sea. Queremos reiterar que este resultado no fue inventado por nuestro equipo, sino que proviene de sistemas funcionando 24 horas analizando a cada cliente.
-
-Actualmente tenemos un informe de sus datos en nuestra base, y nuestro sistema, en un plazo de 1 o 2 meses, puede notificarle cuando logre convertirse en cliente y cumpla con los requerimientos del procedimiento exacto.
-
-Cabe recalcar que contamos con más de 557 consultas por día. No todas son aceptadas, pero quienes fueron aprobados obtuvieron su crédito en tiempo y forma, tal como se muestra en redes mediante testimonios verificables.
-
-Contamos con un equipo amplio. En ocasiones, por cuestiones de análisis avanzado en cada cliente, podemos tardar en brindar respuesta desde asesoría; también hay días en que logramos responder con mayor rapidez.
-
-Comprendemos, ${nombre}, desde el sector de asesoría, su posible enojo o desconfianza. Sin embargo, puede volver al chat y revisar cada mensaje que se le envió para comprender que esto no fue “para obtener su crédito” sino un proceso directo “para obtenerlo” mediante un diagnóstico. Actualmente no es apto, pero en un futuro quizá sí. “No falta mucho” y todo depende del sistema.
 `;
+      doc.text(texto, 20, 90, { maxWidth: 170, align: "justify" });
 
-      doc.text(texto, 20, 70, { maxWidth: 170, align: "justify" });
-
-      // Bloque destacado
-      doc.setFillColor(230,240,255);
-      doc.roundedRect(20, 200, 170, 20, 3, 3, "F");
-      doc.setTextColor(26,115,232);
+      // Gráfico simple: consultas vs aceptadas
       doc.setFont("helvetica", "bold");
-      doc.text("Actualmente no es apto, pero en un futuro quizás sí.", 25, 212);
+      doc.setTextColor(26,115,232);
+      doc.text("Estadísticas de solicitudes", 105, 150, { align: "center" });
 
-      // Firma digital simulada
+      // Ejes
+      doc.setDrawColor(0);
+      doc.line(40, 160, 40, 200); // eje Y
+      doc.line(40, 200, 120, 200); // eje X
+
+      // Barra total consultas
+      doc.setFillColor(200,200,255);
+      doc.rect(50, 180, 20, -40, "F");
+      doc.setTextColor(0);
+      doc.setFontSize(10);
+      doc.text("557 consultas", 50, 175);
+
+      // Barra aceptadas
+      doc.setFillColor(26,115,232);
+      doc.rect(90, 190, 20, -20, "F");
+      doc.text("20% aceptadas", 90, 185);
+
+      // Sello digital
+      doc.setDrawColor(150);
+      doc.setFillColor(240,240,240);
+      doc.circle(170, 250, 20, "F");
+      doc.setFontSize(8);
+      doc.setTextColor(100);
+      doc.text("Documento Oficial", 170, 248, { align: "center" });
+      doc.text("Arprest", 170, 254, { align: "center" });
+
+      // Firma
       doc.setTextColor(0,0,0);
       doc.setFont("times", "italic");
       doc.text("Un abrazo cordial,", 20, 240);
@@ -100,14 +105,6 @@ Comprendemos, ${nombre}, desde el sector de asesoría, su posible enojo o descon
       doc.text("Ramiro Aciar", 20, 248);
       doc.setFont("times", "normal");
       doc.text("Equipo de asesores", 20, 256);
-
-      // Pie de página institucional
-      doc.setFillColor(26,115,232);
-      doc.rect(0, 280, 210, 17, "F");
-      doc.setTextColor(255,255,255);
-      doc.setFontSize(10);
-      doc.text("📞 Tel: +54 264 555-1234   ✉️ contacto@arprest.com   🌐 www.arprest.com", 105, 287, { align: "center" });
-      doc.text("Siempre cerca de nuestros clientes", 105, 293, { align: "center" });
 
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -119,3 +116,4 @@ Comprendemos, ${nombre}, desde el sector de asesoría, su posible enojo o descon
   </script>
 </body>
 </html>
+
