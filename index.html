@@ -2,237 +2,120 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Tiquets Pendientes – Arprest</title>
+  <title>PDF Arprest</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: radial-gradient(1200px 800px at 20% 20%, #6aa8ff 0%, #1a73e8 25%, #0f4fd6 60%, #0b2e7a 100%);
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-    }
-    .card {
-      background: #fff;
-      width: 92%;
-      max-width: 520px;
-      border-radius: 24px;
-      box-shadow: 0 24px 60px rgba(12, 60, 160, 0.35);
-      padding: 34px;
-      text-align: center;
-    }
-    h1 { margin: 0 0 18px; font-size: 28px; color: #0c2e6e; }
-    .sub { color: #3c4b7a; margin-bottom: 18px; font-size: 14px; }
-    input {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      border: 1px solid #d7deea;
-      font-size: 15px;
-      background: #f8fbff;
-      margin-bottom: 12px;
-    }
-    input:focus {
-      outline: none;
-      border-color: #1a73e8;
-      box-shadow: 0 0 0 4px rgba(26,115,232,0.15);
-      background: #fff;
-    }
-    .btn {
-      margin-top: 14px;
-      padding: 14px 18px;
-      border: none;
-      border-radius: 14px;
-      background: linear-gradient(90deg, #1a73e8, #7b3fe4);
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 12px 26px rgba(26,115,232,0.35);
-    }
-    .link { margin-top: 16px; display: none; font-size: 14px; }
-    .copied { margin-top: 10px; color: #128a44; font-weight: 600; display: none; }
-  </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Tiquets pendientes</h1>
-    <p class="sub">Generá el PDF corporativo y compartí el enlace con tu cliente.</p>
-    <input type="text" id="nombre" placeholder="Nombre del cliente" required />
-    <input type="text" id="dni" placeholder="DNI del cliente" required />
-    <button class="btn" id="btnGenerar">Generar enlace</button>
-    <div id="link" class="link"></div>
-    <div id="copied" class="copied">✅ Mensaje copiado al portapapeles</div>
+  <div style="text-align:center; margin-top:40px;">
+    <h1>Generador de PDF Arprest</h1>
+    <input id="nombre" placeholder="Nombre del cliente" style="padding:10px; width:300px;" />
+    <br /><br />
+    <input id="dni" placeholder="DNI del cliente" style="padding:10px; width:300px;" />
+    <br /><br />
+    <button onclick="generarPDF()" style="padding:10px 20px;">Generar PDF</button>
+    <div id="link" style="margin-top:20px;"></div>
+    <div id="copied" style="margin-top:10px; color:green; font-weight:bold; display:none;">✅ Mensaje copiado al portapapeles</div>
   </div>
 
   <script>
-    // Esperar a que jsPDF esté disponible (por el atributo defer del script CDN)
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("btnGenerar");
-      btn.addEventListener("click", generarPDF);
-    });
-
     async function generarPDF() {
-      if (!window.jspdf || !window.jspdf.jsPDF) {
-        alert("No se pudo cargar jsPDF. Verifique su conexión.");
-        return;
-      }
-
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: "mm", format: "a4" });
+      const doc = new jsPDF();
 
       const nombre = document.getElementById("nombre").value.trim();
       const dni = document.getElementById("dni").value.trim();
-      if (!nombre || !dni) {
-        alert("Por favor complete todos los campos.");
-        return;
-      }
+      if (!nombre || !dni) return alert("Completa ambos campos.");
 
       const fecha = new Date().toLocaleDateString("es-AR");
-      const referencia = "Ref: #" + String(new Date().getTime());
+      const ref = "#"+Date.now();
 
-      // ============ Página 1 ============
-      // Logo circular
-      doc.setFillColor(26, 115, 232);
+      // Logo
+      doc.setFillColor(26,115,232);
       doc.circle(105, 25, 15, "F");
-      doc.setTextColor(255, 255, 255);
+      doc.setTextColor(255,255,255);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
       doc.text("Arprest", 105, 29, { align: "center" });
 
-      // Título y línea
-      doc.setTextColor(26, 115, 232);
+      // Título
+      doc.setTextColor(26,115,232);
       doc.setFontSize(13);
       doc.text("Notificación oficial", 105, 45, { align: "center" });
-      doc.setDrawColor(26, 115, 232);
+      doc.setDrawColor(26,115,232);
       doc.setLineWidth(0.8);
       doc.line(20, 48, 190, 48);
 
       // Fecha y referencia
-      doc.setTextColor(100);
       doc.setFontSize(10);
+      doc.setTextColor(100);
       doc.text(`Fecha: ${fecha}`, 20, 54);
-      doc.text(referencia, 190, 54, { align: "right" });
+      doc.text(`Ref: ${ref}`, 190, 54, { align: "right" });
 
-      // Tarjeta de cliente
-      doc.setFillColor(245, 247, 251);
+      // Tarjeta cliente
+      doc.setFillColor(245,247,251);
       doc.roundedRect(20, 60, 170, 18, 3, 3, "F");
       doc.setTextColor(30);
-      doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
       doc.text(`Cliente: ${nombre}`, 26, 68);
       doc.setFont("helvetica", "normal");
       doc.text(`DNI: ${dni}`, 126, 68);
 
-      // Marca de agua
-      doc.setFontSize(38);
-      doc.setTextColor(210);
-      doc.text("ARPREST", 45, 145, { angle: 45 });
-
-      // Párrafos (márgenes amplios: x=25, maxWidth=160)
-      doc.setTextColor(0, 0, 0);
+      // Texto principal
       doc.setFont("times", "normal");
       doc.setFontSize(12);
+      doc.setTextColor(0,0,0);
 
-      const parrafos = [
-        `Estimado/a ${nombre}, acusamos recibo de su solicitud de evaluación crediticia asociada al DNI ${dni}.`,
-        `Para avanzar en el proceso, usted aceptó las políticas informadas por nuestro equipo a través del canal de atención asignado. El análisis se realiza con herramientas automatizadas y controles internos, garantizando objetividad y trazabilidad.`,
-        `Nuestro equipo de asesoría y administración verificó la información y ejecutó las pruebas correspondientes sobre sus datos. El importe abonado fue correctamente imputado al sistema y registrado en su expediente.`,
-        `El resultado actual indica que usted no es apto para operar con nosotros en este momento. Este dictamen surge de los criterios del sistema y no de decisiones discrecionales del equipo. El análisis corre 24/7 y se actualiza de forma periódica.`,
-        `Su perfil permanece en observación. En un plazo estimado de 1 a 2 meses, el sistema podrá reevaluar su caso y notificarle automáticamente si cumple con los requerimientos vigentes.`,
-        `Recibimos un volumen elevado de consultas diarias. Si bien no todas resultan aprobadas, los casos aceptados obtienen su crédito en tiempo y forma, conforme a los procesos internos y evidencia publicada en canales oficiales.`,
-        `Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes previos, puede hacerlo en el chat asignado. Nuestro objetivo es que el procedimiento sea claro y respetuoso, y que usted cuente con información precisa en cada etapa.`
-      ];
+      const texto = `
+Estimado/a ${nombre}, acusamos recibo de su solicitud de evaluación crediticia asociada al DNI ${dni}.
 
-      let y = 80;
-      const margenX = 25;
-      const anchoTexto = 160; // asegura margen derecho
-      parrafos.forEach((p) => {
-        const lines = doc.splitTextToSize(p, anchoTexto);
-        doc.text(lines, margenX, y, { align: "justify" });
-        y += lines.length * 6 + 4;
+Para avanzar en el proceso, usted aceptó las políticas informadas por nuestro equipo a través del canal de atención asignado. El análisis se realiza con herramientas automatizadas y controles internos, garantizando objetividad y trazabilidad.
+
+Nuestro equipo de asesoría y administración verificó la información y ejecutó las pruebas correspondientes sobre sus datos. El importe abonado fue correctamente imputado al sistema y registrado en su expediente.
+
+El resultado actual indica que usted no es apto para operar con nosotros en este momento. Este dictamen surge de los criterios del sistema y no de decisiones discrecionales del equipo. El análisis corre 24/7 y se actualiza de forma periódica.
+
+Su perfil permanece en observación. En un plazo estimado de 1 a 2 meses, el sistema podrá reevaluar su caso y notificarle automáticamente si cumple con los requerimientos vigentes.
+
+Recibimos un volumen elevado de consultas diarias. Si bien no todas resultan aprobadas, los casos aceptados obtienen su crédito en tiempo y forma, conforme a los procesos internos y evidencia publicada en canales oficiales.
+
+Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes previos, puede hacerlo en el chat asignado. Nuestro objetivo es que el procedimiento sea claro y respetuoso, y que usted cuente con información precisa en cada etapa.
+`;
+
+      const parrafos = doc.splitTextToSize(texto, 160);
+      let y = 85;
+      parrafos.forEach(line => {
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 25, y);
+        y += 6;
       });
 
       // Bloque destacado
-      doc.setFillColor(230, 240, 255);
+      if (y > 250) { doc.addPage(); y = 20; }
+      doc.setFillColor(230,240,255);
       doc.roundedRect(20, y, 170, 16, 3, 3, "F");
-      doc.setTextColor(26, 115, 232);
+      doc.setTextColor(26,115,232);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(11);
       doc.text("Resultado actual: No apto. Reevaluación automática estimada: 1–2 meses.", 25, y + 10);
 
       // Firma
-      const firmaBaseY = y + 28;
-      doc.setTextColor(0, 0, 0);
+      y += 30;
+      doc.setTextColor(0,0,0);
       doc.setFont("times", "italic");
       doc.setFontSize(12);
-      doc.text("Atentamente,", 20, firmaBaseY);
+      doc.text("Atentamente,", 20, y);
       doc.setFont("helvetica", "bold");
-      doc.text("Ramiro Aciar", 20, firmaBaseY + 8);
+      doc.text("Ramiro Aciar", 20, y + 8);
       doc.setFont("times", "normal");
-      doc.text("Equipo de asesores – Arprest", 20, firmaBaseY + 16);
-
-      // ============ Página 2 ============
-      doc.addPage();
-
-      // Encabezado
-      doc.setTextColor(26, 115, 232);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(13);
-      doc.text("Resumen y métricas", 105, 20, { align: "center" });
-      doc.setDrawColor(26, 115, 232);
-      doc.setLineWidth(0.6);
-      doc.line(20, 22, 190, 22);
-
-      // Resumen del caso
-      doc.setFontSize(11);
-      doc.setTextColor(30);
-      doc.setFont("helvetica", "bold");
-      doc.text("Resumen del caso", 20, 34);
-
-      doc.setDrawColor(200);
-      doc.roundedRect(20, 38, 170, 28, 3, 3);
-      doc.setFont("helvetica", "normal");
-      doc.text("Cliente:", 26, 48);
-      doc.text(nombre, 55, 48);
-      doc.text("DNI:", 26, 56);
-      doc.text(dni, 55, 56);
-      doc.text("Estado:", 100, 48);
-      doc.setTextColor(200, 60, 60);
-      doc.text("No apto (temporal)", 123, 48);
-      doc.setTextColor(30);
-      doc.text("Reevaluación estimada:", 100, 56);
-      doc.text("1–2 meses", 153, 56);
-
-      // Gráfico simple
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(26, 115, 232);
-      doc.text("Estadísticas de solicitudes (ejemplo)", 105, 78, { align: "center" });
-
-      doc.setDrawColor(120);
-      doc.line(40, 85, 40, 125); // eje Y
-      doc.line(40, 125, 140, 125); // eje X
-
-      doc.setFillColor(200, 210, 255);
-      doc.rect(55, 125, 22, -36, "F");
-      doc.setTextColor(30);
-      doc.setFontSize(10);
-      doc.text("557 consultas", 66, 129, { align: "center" });
-
-      doc.setFillColor(26, 115, 232);
-      doc.rect(100, 125, 22, -18, "F");
-      doc.text("20% aceptadas", 111, 129, { align: "center" });
-
-      doc.setTextColor(100);
-      doc.setFontSize(9);
-      doc.text("Las métricas son ilustrativas y pueden variar según el período analizado.", 40, 135);
+      doc.text("Equipo de asesores – Arprest", 20, y + 16);
 
       // Sello digital
       doc.setDrawColor(160);
-      doc.setFillColor(245, 245, 245);
+      doc.setFillColor(245,245,245);
       doc.circle(170, 250, 20, "F");
       doc.setFontSize(8);
       doc.setTextColor(100);
@@ -241,13 +124,12 @@
       doc.setFont("helvetica", "normal");
       doc.text("Arprest", 170, 253, { align: "center" });
 
-      // ============ Salida ============
+      // Salida
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
 
-      const linkDiv = document.getElementById("link");
-      linkDiv.innerHTML = `<a href="${pdfUrl}" target="_blank">📄 Abrir PDF generado</a>`;
-      linkDiv.style.display = "block";
+      document.getElementById("link").innerHTML = `<a href="${pdfUrl}" target="_blank">📄 Abrir PDF generado</a>`;
+      document.getElementById("link").style.display = "block";
 
       const mensaje = `✨ Hola Sr./Sra. ${nombre} ✨
 Soy Ramiro Aciar del equipo de asesores 💼 respecto al crédito que solicitó.
@@ -262,7 +144,6 @@ Gracias por confiar en Arprest 🙌💙`;
         await navigator.clipboard.writeText(mensaje);
         document.getElementById("copied").style.display = "block";
       } catch (e) {
-        // Si el navegador no permite copiar automáticamente
         console.warn("No se pudo copiar al portapapeles automáticamente.");
       }
     }
