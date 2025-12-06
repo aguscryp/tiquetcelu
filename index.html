@@ -62,6 +62,14 @@
       doc.setFont("helvetica", "normal");
       doc.text(`DNI: ${dni}`, 126, 68);
 
+      // Varias marcas de agua
+      doc.setFontSize(40);
+      doc.setTextColor(220);
+      doc.setFont("helvetica", "bold");
+      doc.text("ARPREST", 60, 120, { angle: 45 });
+      doc.text("ARPREST", 120, 200, { angle: 45 });
+      doc.text("ARPREST", 30, 250, { angle: 45 });
+
       // Texto principal
       doc.setFont("times", "normal");
       doc.setFontSize(12);
@@ -118,6 +126,14 @@ Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes pre
       // ===== Página 2 =====
       doc.addPage();
 
+      // Varias marcas de agua también en página 2
+      doc.setFontSize(40);
+      doc.setTextColor(220);
+      doc.setFont("helvetica", "bold");
+      doc.text("ARPREST", 60, 120, { angle: 45 });
+      doc.text("ARPREST", 120, 200, { angle: 45 });
+      doc.text("ARPREST", 30, 250, { angle: 45 });
+
       // Encabezado
       doc.setTextColor(26,115,232);
       doc.setFont("helvetica", "bold");
@@ -147,30 +163,33 @@ Entendemos su inquietud y valoramos su tiempo. Si desea revisar los mensajes pre
       doc.text("Reevaluación estimada:", 100, 56);
       doc.text("1–2 meses", 153, 56);
 
-      // Gráfico simple
+            // Gráfico actualizado
       doc.setFont("helvetica", "bold");
       doc.setTextColor(26,115,232);
-      doc.text("Estadísticas de solicitudes (ejemplo)", 105, 78, { align: "center" });
+      doc.text("Estadísticas de solicitudes", 105, 78, { align: "center" });
 
       doc.setDrawColor(120);
       doc.line(40, 85, 40, 125); // eje Y
-      doc.line(40, 125, 140, 125); // eje X
+      doc.line(40, 125, 170, 125); // eje X
 
+      // Barra 1: 557 consultas
       doc.setFillColor(200,210,255);
-      doc.rect(55, 125, 22, -36, "F");
+      doc.rect(55, 125, 30, -36, "F");
       doc.setTextColor(30);
       doc.setFontSize(10);
-      doc.text("557 consultas", 66, 129, { align: "center" });
+      doc.text("557 consultas", 70, 129, { align: "center" });
 
+      // Barra 2: 78% aprobados
       doc.setFillColor(26,115,232);
-      doc.rect(100, 125, 22, -18, "F");
-      doc.text("20% aceptadas", 111, 129, { align: "center" });
+      doc.rect(110, 125, 30, -28, "F");
+      doc.setTextColor(30);
+      doc.text("78% aprobados", 125, 129, { align: "center" });
 
       doc.setTextColor(100);
       doc.setFontSize(9);
-      doc.text("Las métricas son ilustrativas y pueden variar según el período analizado.", 40, 135);
+      doc.text("Las métricas son ilustrativas y pueden variar según el período analizado.", 40, 140);
 
-            // Sello digital
+      // Sello digital
       doc.setDrawColor(160);
       doc.setFillColor(245,245,245);
       doc.circle(170, 250, 20, "F");
@@ -207,4 +226,3 @@ Gracias por confiar en Arprest 🙌💙`;
   </script>
 </body>
 </html>
-
